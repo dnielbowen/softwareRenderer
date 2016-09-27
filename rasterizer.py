@@ -13,11 +13,10 @@
 
 import collections
 import numpy
+
 from PIL import Image
 
-imFilename = "triangleRasterized.png"
-
-Vertex = collections.namedtuple('Vertex', 'x y z color')
+import util
 
 # Draws triangles to an image
 class Rasterizer:
@@ -101,21 +100,18 @@ class Rasterizer:
         for i in range(3):
             self.rasterizeLine(v[i], v[(i+1)%3])
 
-        def _floodFill(v):
-            if self.rasterStencil[v.y*self.w + v.x] != self.iRaster:
-                self.setPixel(v.x, v.y, v.color) # XXX interpolate color
-                _floodFill(Vertex(v.x+1, v.y, v.z, v.color))
-                _floodFill(Vertex(v.x-1, v.y, v.z, v.color))
-                _floodFill(Vertex(v.x, v.y+1, v.z, v.color))
-                _floodFill(Vertex(v.x, v.y-1, v.z, v.color))
+        def _floodFill(x, y):
+            if self.rasterStencil[y*self.w + x] != self.iRaster:
+                self.setPixel(x, y, v[0].color) # XXX interpolate color
+                _floodFill(x+1, y)
+                _floodFill(x-1, y)
+                _floodFill(x, y+1)
+                _floodFill(x, y-1)
 
         # Recursively fill, starting from the center
-        vCenter = Vertex(
-                (v[0].x + v[1].x + v[2].x)/3,
-                (v[0].y + v[1].y + v[2].y)/3,
-                (v[0].z + v[1].z + v[2].z)/3,
-                v[0].color)
-        _floodFill(vCenter)
+        xCenter = v[0].x + v[1].x + v[2].x/3
+        yCenter = v[0].y + v[1].y + v[2].y/3
+        _floodFill(xCenter, yCenter)
         self.iRaster += 1
 
     # Renders in pixel 0's color
@@ -170,17 +166,18 @@ class Rasterizer:
 
 
 triangleVertices = [
-    Vertex(10.0, 10.0, 0.5, (255, 0, 0)),
-    Vertex(40.0, 200.0, 0.5, (0, 255, 0)),
-    Vertex(400.0, 230.0, 0.5, (0, 0, 255)),
+    util.Vertex(10.0, 10.0, 0.5, (255, 0, 0)),
+    util.Vertex(40.0, 200.0, 0.5, (0, 255, 0)),
+    util.Vertex(400.0, 230.0, 0.5, (0, 0, 255)),
 ]
 
 t2Verts = [
-    Vertex(2, 4, 0.5, (88, 88, 88)),
-    Vertex(4, 1, 0.5, (88, 88, 88)),
-    Vertex(3, 3, 0.5, (88, 88, 88)),
+    util.Vertex(2, 4, 0.5, (88, 88, 88)),
+    util.Vertex(4, 1, 0.5, (88, 88, 88)),
+    util.Vertex(3, 3, 0.5, (88, 88, 88)),
 ]
 
+imFilename = "triangleRasterized.png"
 r = Rasterizer(500, 500)
 # r.rasterizeTriangleFlood(triangleVertices)
 r.rasterizeTriangleScanline(triangleVertices)

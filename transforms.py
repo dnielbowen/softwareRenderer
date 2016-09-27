@@ -1,35 +1,9 @@
 import math
-import random
 import collections
+
 import numpy as np
 
-# This should really be shared between rasterizer and geometry transformer
-Vertex = collections.namedtuple('Vertex', 'pos color')
-
-# I need to go from local to world to view to perspective to normalized to 
-# screen
-
-randomColor = lambda: tuple(random.randint(0,255) for i in range(3))
-point = lambda x,y,z: np.mat(((x), (y), (z), (1))).transpose() # Homog coords
-cubeVertices = [
-    Vertex(point( 1, 1, 1), randomColor()),
-    Vertex(point(-1, 1, 1), randomColor()),
-    Vertex(point(-1,-1, 1), randomColor()),
-    Vertex(point( 1,-1, 1), randomColor()),
-    Vertex(point( 1, 1,-1), randomColor()),
-    Vertex(point(-1, 1,-1), randomColor()),
-    Vertex(point(-1,-1,-1), randomColor()),
-    Vertex(point( 1,-1,-1), randomColor()),
-]
-
-cubeFaceIndices = [
-    (0,1,3), (1,2,3), # Top face
-    (4,5,6), (4,6,7), # Bottom face
-    (1,0,4), (1,4,5), # Front-right
-    (2,3,4), (3,7,4), # Front-left
-    (1,6,2), (1,5,6), # Back-right
-    (3,7,6), (2,3,6), # Back-left
-]
+import util
 
 ################################################## WORLD
 # Place the object in the world --- keep it at home for now
@@ -84,20 +58,39 @@ matWVPS = matWVP.dot(matWindow)
 ##################################################
 # Alright, let's start transforming geometry!
 
-v1w = cubeVertices[2].pos
-v1v = matView * v1w
-v1p = (matProj * v1v) / v1v[2]
-v1s = matWindow * v1p
+# v1w = cubeVertices[2].pos
+# v1v = matView * v1w
+# v1p = (matProj * v1v) / v1v[2]
+# v1s = matWindow * v1p
+
+cubeVertices = [
+    util.Vertex( 1, 1, 1, util.randomColor()),
+    util.Vertex(-1, 1, 1, util.randomColor()),
+    util.Vertex(-1,-1, 1, util.randomColor()),
+    util.Vertex( 1,-1, 1, util.randomColor()),
+    util.Vertex( 1, 1,-1, util.randomColor()),
+    util.Vertex(-1, 1,-1, util.randomColor()),
+    util.Vertex(-1,-1,-1, util.randomColor()),
+    util.Vertex( 1,-1,-1, util.randomColor()),
+]
+
+cubeFaceIndices = [
+    (0,1,3), (1,2,3), # Top face
+    (4,5,6), (4,6,7), # Bottom face
+    (1,0,4), (1,4,5), # Front-right
+    (2,3,4), (3,7,4), # Front-left
+    (1,6,2), (1,5,6), # Back-right
+    (3,7,6), (2,3,6), # Back-left
+]
+
 
 def vertexProcessor(v):
-    vw = v.pos # Vertex in local/world space (same in this case)
+    vw = util.vert2mat(v)
     vv = matView * vw # Vertex in view space
     vp = (matProj * vv) / vv[2] # Projection and perspective divide
     vs = matWindow * vp # Window scaling
-    return Vertex(pos=vs, color=v.color)
+    return util.Vertex(float(vs[0]), float(vs[1]), float(vs[2]), color=v.color)
 
 primitive = []
 for v in (cubeVertices[i] for i in cubeFaceIndices[3]):
     primitive.append(vertexProcessor(v))
-
-Rasterizer
