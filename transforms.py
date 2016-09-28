@@ -14,7 +14,7 @@ class TriangleRenderer:
         self.w, self.h = w, h
         self.rasterizer = rasterizer.Rasterizer(self.w, self.h)
 
-        self.cameraPos = np.array((3, 2, 2))
+        self.cameraPos = np.array((2, 1, 1))
         self.cameraTarget = np.array((0,0,0))
         self.changeCamera(self.cameraPos, self.cameraTarget)
 
@@ -23,7 +23,7 @@ class TriangleRenderer:
         self.cameraPos = pos
         self.cameraTarget = target
         self.hfov = hfov
-        cameraUp = np.array((0,0,1))
+        cameraUp = np.array((0,1,0))
         cameraZ = self.cameraTarget - self.cameraPos
         cameraZ = cameraZ / np.linalg.norm(cameraZ)
         cameraY = np.cross(np.cross(cameraZ, cameraUp), cameraZ)
