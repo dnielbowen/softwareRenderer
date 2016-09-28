@@ -10,20 +10,20 @@ import rasterizer
 
 # Combines rasterizer and camera parameters (FOV)
 class TriangleRenderer:
-    def __init__(self, w, h, hfov=63):
+    def __init__(self, w, h):
         self.w, self.h = w, h
-        self.hfov = hfov
         self.rasterizer = rasterizer.Rasterizer(self.w, self.h)
 
-        self.cameraPos = np.array((5, 5, 5))
+        self.cameraPos = np.array((3, 2, 2))
         self.cameraTarget = np.array((0,0,0))
         self.changeCamera(self.cameraPos, self.cameraTarget)
 
     # pos is np.array((-,-,-))
-    def changeCamera(self, pos, target):
+    def changeCamera(self, pos, target, hfov=60):
         self.cameraPos = pos
         self.cameraTarget = target
-        cameraUp = np.array((0,1,0))
+        self.hfov = hfov
+        cameraUp = np.array((0,0,1))
         cameraZ = self.cameraTarget - self.cameraPos
         cameraZ = cameraZ / np.linalg.norm(cameraZ)
         cameraY = np.cross(np.cross(cameraZ, cameraUp), cameraZ)
@@ -40,8 +40,7 @@ class TriangleRenderer:
         projWinWidth = 2
         aspectRatio = 1 # 4/3, etc
         projWinHeight = projWinWidth/aspectRatio
-        projHFOV = 63 # Degrees
-        d = projWinWidth/(2*math.tan(projHFOV/2*math.pi/180))
+        d = projWinWidth/(2*math.tan(self.hfov/2*math.pi/180))
         farPlane = 1000
 
         matProj = np.mat((

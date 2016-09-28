@@ -1,4 +1,5 @@
 import util
+import math
 
 import numpy as np
 
@@ -24,19 +25,22 @@ cubeFaceIndices = [
     (3,7,6), (2,3,6), # Back-left
 ]
 
-################################################## WORLD
-# Place the object in the world --- keep it at home for now
-matWorld = np.eye(4)
-
-################################################## SCREEN
 imWidth = 600
 imHeight = 600
-imFilename = "cubeRender.png"
+nFrames = 120
+nRevolutions = 1
 
-for iFace, face in enumerate(cubeFaceIndices):
-    triangle = [cubeVertices[i] for i in face]
+for iRevolution in range(nFrames):
+    th = iRevolution * (2*math.pi/nFrames) * nRevolutions
+
+    matWorld = np.eye(4)
+    matWorld[0:2,0:2] = np.mat(
+            ((math.cos(th), -math.sin(th)), (math.sin(th), math.cos(th))))
+
     tr = transforms.TriangleRenderer(imWidth, imHeight)
-    tr.renderTriangle(triangle, matWorld)
-    print("Rendered face %d" % iFace)
+    for iFace, face in enumerate(cubeFaceIndices):
+        triangle = [cubeVertices[i] for i in face]
+        tr.renderTriangle(triangle, matWorld)
 
-tr.rasterizer.save(imFilename)
+    tr.rasterizer.save("frames/frame_%03d.png" % iRevolution)
+    print("Saving frame %d" % iRevolution)

@@ -3,14 +3,6 @@
 # computer graphics were rendered as wireframes. It takes far less time to 
 # rasterize a few lines than to fill a bunch of polygons.
 
-# Attempt to create a rasterizer by cutting straight to the chase of NDC 
-# triangles with attributes (like color).
-# NDC is [-1,+1] in all dimensions
-
-# It seems I'd probably have to iterate left-right across pixels between 
-# bounds. That is, I'd pick, say, the top-most y coordinate of the triangle (in 
-# screen space),
-
 import collections
 import numpy
 
@@ -114,10 +106,10 @@ class Rasterizer:
         _floodFill(xCenter, yCenter)
         self.iRaster += 1
 
-    # Renders in pixel 0's color
     def rasterizeTriangleWireframe(self, v, color=(255, 255, 255)):
         for i in range(3):
             self.rasterizeLine(v[i], v[(i+1)%3], color)
+        self.iRaster += 1
 
     # Recommended way to rasterize something
     # v contains 3 vertices
@@ -164,22 +156,15 @@ class Rasterizer:
         im.putdata(self.fb)
         im.save(imageFilename)
 
-
-triangleVertices = [
-    util.Vertex(10.0, 10.0, 0.5, (255, 0, 0)),
-    util.Vertex(40.0, 200.0, 0.5, (0, 255, 0)),
-    util.Vertex(400.0, 230.0, 0.5, (0, 0, 255)),
-]
-
-t2Verts = [
-    util.Vertex(2, 4, 0.5, (88, 88, 88)),
-    util.Vertex(4, 1, 0.5, (88, 88, 88)),
-    util.Vertex(3, 3, 0.5, (88, 88, 88)),
-]
-
-imFilename = "triangleRasterized.png"
-r = Rasterizer(500, 500)
-# r.rasterizeTriangleFlood(triangleVertices)
-r.rasterizeTriangleScanline(triangleVertices)
-r.rasterizeTriangleWireframe(triangleVertices)
-r.save(imFilename)
+if __name__ == "__main__":
+    triangleVertices = [
+        util.Vertex(10.0, 10.0, 0.5, (255, 0, 0)),
+        util.Vertex(40.0, 200.0, 0.5, (0, 255, 0)),
+        util.Vertex(400.0, 230.0, 0.5, (0, 0, 255)),
+    ]
+    imFilename = "triangleRasterized.png"
+    r = Rasterizer(500, 500)
+    # r.rasterizeTriangleFlood(triangleVertices)
+    r.rasterizeTriangleScanline(triangleVertices)
+    r.rasterizeTriangleWireframe(triangleVertices)
+    r.save(imFilename)
