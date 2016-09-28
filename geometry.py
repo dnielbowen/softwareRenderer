@@ -1,5 +1,8 @@
 import util
-import d
+
+import numpy as np
+
+import transforms
 
 cubeVertices = [
     util.Vertex( 1, 1, 1, util.randomColor()),
@@ -21,4 +24,19 @@ cubeFaceIndices = [
     (3,7,6), (2,3,6), # Back-left
 ]
 
-imFilename = "triangleRasterized.png"
+################################################## WORLD
+# Place the object in the world --- keep it at home for now
+matWorld = np.eye(4)
+
+################################################## SCREEN
+imWidth = 600
+imHeight = 600
+imFilename = "cubeRender.png"
+
+for iFace, face in enumerate(cubeFaceIndices):
+    triangle = [cubeVertices[i] for i in face]
+    tr = transforms.TriangleRenderer(imWidth, imHeight)
+    tr.renderTriangle(triangle, matWorld)
+    print("Rendered face %d" % iFace)
+
+tr.rasterizer.save(imFilename)

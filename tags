@@ -1,0 +1,40 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Point3	util.py	/^Point3 = collections.namedtuple('Point3', 'x y z')$/;"	v
+Point4	util.py	/^Point4 = collections.namedtuple('Point3', 'x y z w')$/;"	v
+Rasterizer	rasterizer.py	/^class Rasterizer:$/;"	c
+TriangleRenderer	transforms.py	/^class TriangleRenderer:$/;"	c
+Vertex	util.py	/^Vertex = collections.namedtuple('Vertex', 'x y z color')$/;"	v
+__init__	rasterizer.py	/^    def __init__(self, w, h):$/;"	m	class:Rasterizer
+__init__	transforms.py	/^    def __init__(self, w, h, hfov=63):$/;"	m	class:TriangleRenderer
+_floodFill	rasterizer.py	/^        def _floodFill(x, y):$/;"	f	function:Rasterizer.rasterizeTriangleFlood
+bgColor	rasterizer.py	/^    bgColor = (200, 200, 200)$/;"	v	class:Rasterizer
+changeCamera	transforms.py	/^    def changeCamera(pos, target):$/;"	m	class:TriangleRenderer
+cubeFaceIndices	geometry.py	/^cubeFaceIndices = [$/;"	v
+cubeVertices	geometry.py	/^cubeVertices = [$/;"	v
+imFilename	geometry.py	/^imFilename = "cubeRender.png"$/;"	v
+imFilename	rasterizer.py	/^imFilename = "triangleRasterized.png"$/;"	v
+imHeight	geometry.py	/^imHeight = 600$/;"	v
+imWidth	geometry.py	/^imWidth = 600$/;"	v
+matWorld	geometry.py	/^matWorld = np.eye(4)$/;"	v
+point	util.py	/^point = lambda x,y,z: np.mat(((x), (y), (z), (1))).transpose()$/;"	v
+r	rasterizer.py	/^r = Rasterizer(500, 500)$/;"	v
+randomColor	util.py	/^randomColor = lambda: tuple(random.randint(0,255) for i in range(3))$/;"	v
+rasterizeLine	rasterizer.py	/^    def rasterizeLine(self, v0, v1, color=None):$/;"	m	class:Rasterizer
+rasterizeTriangleFlood	rasterizer.py	/^    def rasterizeTriangleFlood(self, v): #, rasterStencil):$/;"	m	class:Rasterizer
+rasterizeTriangleScanline	rasterizer.py	/^    def rasterizeTriangleScanline(self, v):$/;"	m	class:Rasterizer
+rasterizeTriangleWireframe	rasterizer.py	/^    def rasterizeTriangleWireframe(self, v, color=(255, 255, 255)):$/;"	m	class:Rasterizer
+renderTriangle	transforms.py	/^    def renderTriangle(vertices, matWorld):$/;"	m	class:TriangleRenderer
+save	rasterizer.py	/^    def save(self, imageFilename):$/;"	m	class:Rasterizer
+setPixel	rasterizer.py	/^    def setPixel(self, x, y, color):$/;"	m	class:Rasterizer
+t2Verts	rasterizer.py	/^t2Verts = [$/;"	v
+tr	geometry.py	/^tr = transforms.TriangleRenderer(imWidth, imHeight)$/;"	v
+triIntpScanline	rasterizer.py	/^    def triIntpScanline(self, x, y, v, vertVals):$/;"	m	class:Rasterizer
+triangle	geometry.py	/^triangle = [cubeVertices[i] for i in cubeFaceIndices[3]]$/;"	v
+triangleVertices	rasterizer.py	/^triangleVertices = [$/;"	v
+vert2mat	util.py	/^vert2mat = lambda v: np.mat(((v.x), (v.y), (v.z), (1))).transpose()$/;"	v
+vertexProcessor	transforms.py	/^    def vertexProcessor(vWorld):$/;"	m	class:TriangleRenderer

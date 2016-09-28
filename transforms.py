@@ -4,93 +4,67 @@ import collections
 import numpy as np
 
 import util
+import rasterizer
 
-################################################## WORLD
-# Place the object in the world --- keep it at home for now
-matWorld = np.eye(4)
+# Vertices go from local to object to camera to projection to screen.
 
-################################################## VIEW
-cameraPos = np.array((45,45,45))
-cameraTarget = np.array((0,0,0))
-cameraUp = np.array((0,1,0))
-cameraZ = cameraTarget - cameraPos
-cameraZ = cameraZ / np.linalg.norm(cameraZ)
-cameraY = np.cross(np.cross(cameraZ, cameraUp), cameraZ)
-cameraY = cameraY / np.linalg.norm(cameraY)
-cameraX = np.cross(cameraZ, cameraY)
+# Combines rasterizer and camera parameters (FOV)
+class TriangleRenderer:
+    def __init__(self, w, h, hfov=63):
+        self.w, self.h = w, h
+        self.hfov = hfov
+        self.rasterizer = rasterizer.Rasterizer(self.w, self.h)
 
-# I'm sure there's a more efficient/direct way of writing matView other than 
-# computing its inverse, but this is the most non-blackbox method
-matView = np.eye(4)
-matView[0:3, 0:4] = np.mat((cameraX, cameraY, cameraZ, cameraPos)).transpose()
-matView = np.linalg.inv(matView)
+        self.cameraPos = np.array((5, 5, 5))
+        self.cameraTarget = np.array((0,0,0))
+        self.changeCamera(self.cameraPos, self.cameraTarget)
 
-################################################## PROJECTION
-projWinWidth = 2
-aspectRatio = 1 # 4/3, etc
-projWinHeight = projWinWidth/aspectRatio
-projHFOV = 63 # Degrees
-d = projWinWidth/(2*math.tan(projHFOV/2*math.pi/180))
-farPlane = 1000
+    # pos is np.array((-,-,-))
+    def changeCamera(self, pos, target):
+        self.cameraPos = pos
+        self.cameraTarget = target
+        cameraUp = np.array((0,1,0))
+        cameraZ = self.cameraTarget - self.cameraPos
+        cameraZ = cameraZ / np.linalg.norm(cameraZ)
+        cameraY = np.cross(np.cross(cameraZ, cameraUp), cameraZ)
+        cameraY = cameraY / np.linalg.norm(cameraY)
+        cameraX = np.cross(cameraZ, cameraY)
 
-matProj = np.mat((
-    (2*d/projWinWidth, 0, 0, 0),
-    (0, 2*d/projWinHeight, 0, 0),
-    (0, 0, (farPlane+d)/(farPlane-d), 2*d*farPlane/(farPlane-d)),
-    (0, 0, 1, 0)))
+        matView = np.eye(4)
+        matView[0:3, 0:4] = np.mat((
+            cameraX, cameraY, cameraZ, self.cameraPos)).transpose()
+        matView = np.linalg.inv(matView)
+        self.matView = matView
 
-################################################## SCREEN
-imWidth = 600
-imHeight = 600
+        ################################################## PROJECTION
+        projWinWidth = 2
+        aspectRatio = 1 # 4/3, etc
+        projWinHeight = projWinWidth/aspectRatio
+        projHFOV = 63 # Degrees
+        d = projWinWidth/(2*math.tan(projHFOV/2*math.pi/180))
+        farPlane = 1000
 
-matWindow = np.eye(4)
-matWindow[0:2, 0:2] = np.mat(((imWidth/2, 0), (0, -imHeight/2)))
-matWindow[0:2, 3] = np.mat(((imWidth/2), (imHeight/2)))
+        matProj = np.mat((
+            (2*d/projWinWidth, 0, 0, 0),
+            (0, 2*d/projWinHeight, 0, 0),
+            (0, 0, (farPlane+d)/(farPlane-d), 2*d*farPlane/(farPlane-d)),
+            (0, 0, 1, 0)))
+        self.matProj = matProj
 
-# Everything is now in NDC (after perspective divide) --- I now need to compute 
-# the screen transformation
+        matWindow = np.eye(4)
+        matWindow[0:2, 0:2] = np.mat(((self.w/2, 0), (0, -self.h/2)))
+        matWindow[0:2, 3] = np.mat(((self.w/2), (self.h/2)))
+        self.matWindow = matWindow
 
-################################################## COMPOSITES
-matWV = matWorld.dot(matView)
-matWVP = matWV.dot(matProj)
-matWVPS = matWVP.dot(matWindow)
+    def vertexProcessor(self, v, matWorld):
+        vl = util.vert2mat(v)
+        vw = matWorld * vl
+        vv = self.matView * vw # Vertex in view space
+        vp = (self.matProj * vv) / vv[2] # Projection and perspective divide
+        vs = self.matWindow * vp # Window scaling
+        return util.Vertex(
+                float(vs[0]), float(vs[1]), float(vs[2]), color=v.color)
 
-##################################################
-# Alright, let's start transforming geometry!
-
-# v1w = cubeVertices[2].pos
-# v1v = matView * v1w
-# v1p = (matProj * v1v) / v1v[2]
-# v1s = matWindow * v1p
-
-cubeVertices = [
-    util.Vertex( 1, 1, 1, util.randomColor()),
-    util.Vertex(-1, 1, 1, util.randomColor()),
-    util.Vertex(-1,-1, 1, util.randomColor()),
-    util.Vertex( 1,-1, 1, util.randomColor()),
-    util.Vertex( 1, 1,-1, util.randomColor()),
-    util.Vertex(-1, 1,-1, util.randomColor()),
-    util.Vertex(-1,-1,-1, util.randomColor()),
-    util.Vertex( 1,-1,-1, util.randomColor()),
-]
-
-cubeFaceIndices = [
-    (0,1,3), (1,2,3), # Top face
-    (4,5,6), (4,6,7), # Bottom face
-    (1,0,4), (1,4,5), # Front-right
-    (2,3,4), (3,7,4), # Front-left
-    (1,6,2), (1,5,6), # Back-right
-    (3,7,6), (2,3,6), # Back-left
-]
-
-
-def vertexProcessor(v):
-    vw = util.vert2mat(v)
-    vv = matView * vw # Vertex in view space
-    vp = (matProj * vv) / vv[2] # Projection and perspective divide
-    vs = matWindow * vp # Window scaling
-    return util.Vertex(float(vs[0]), float(vs[1]), float(vs[2]), color=v.color)
-
-primitive = []
-for v in (cubeVertices[i] for i in cubeFaceIndices[3]):
-    primitive.append(vertexProcessor(v))
+    def renderTriangle(self, vertices, matWorld):
+        vsScreen = [self.vertexProcessor(v, matWorld) for v in vertices]
+        self.rasterizer.rasterizeTriangleWireframe(vsScreen)

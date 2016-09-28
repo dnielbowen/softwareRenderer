@@ -73,7 +73,7 @@ class Rasterizer:
         color = v[0] if color is None else color
         verticalLine = (v1.x == v0.x)
         if verticalLine:
-            for yPx in range(int(min(v0.y, v1.y)), max(v0.y, v1.y)+1):
+            for yPx in range(int(min(v0.y, v1.y)), int(max(v0.y, v1.y))+1):
                 self.setPixel(v0.x, yPx, color)
             return
         else:
