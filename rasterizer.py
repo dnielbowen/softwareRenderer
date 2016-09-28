@@ -5,6 +5,7 @@
 
 import collections
 import numpy
+import sys
 
 from PIL import Image
 
@@ -25,11 +26,16 @@ class Rasterizer:
         self.rasterStencil = [0 for i in range(self.w*self.h)]
         self.iRaster = 1
 
-    def setPixel(self, x, y, color):
+        self.depthBuffer = [sys.maxint for i in range(self.w*self.h)]
+
+    def setPixel(self, x, y, z, color):
         x, y = int(x), int(y)
+        i = y*self.w + x
         if 0 <= x < self.w and 0 <= y < self.h:
-            self.fb[y*self.w + x] = color
-            self.rasterStencil[y*self.w + x] = self.iRaster
+            if self.depthBuffer[i] > z:
+                self.fb[i] = color
+                self.rasterStencil[i] = self.iRaster
+                self.depthBuffer[i]
 
     # Horiznotal scanline-style barycentric interpolation within a triangle
     # XXX Works great when there's a large vertical distance between vertices, 
@@ -66,7 +72,7 @@ class Rasterizer:
         verticalLine = (v1.x == v0.x)
         if verticalLine:
             for yPx in range(int(min(v0.y, v1.y)), int(max(v0.y, v1.y))+1):
-                self.setPixel(v0.x, yPx, color)
+                self.setPixel(v0.x, yPx, v0.z, color)
             return
         else:
             m = (v1.y-v0.y)/float(v1.x-v0.x)
@@ -76,12 +82,12 @@ class Rasterizer:
             dir = 1 if v1.y > v0.y else -1
             for yPx in range(int(v0.y), int(v1.y)+dir, dir):
                 xPx = int(mp*(yPx-v0.y) + v0.x)
-                self.setPixel(xPx, yPx, color)
+                self.setPixel(xPx, yPx, v0.z, color)
         else:
             dir = 1 if v1.x > v0.x else -1
             for xPx in range(int(v0.x), int(v1.x)+dir, dir):
                 yPx = int(m*(xPx-v0.x) + v0.y)
-                self.setPixel(xPx, yPx, color)
+                self.setPixel(xPx, yPx, v0.z, color)
 
     # v contains 3 vertices
     # This method works and is most elegant, but in practice it has an 
@@ -94,7 +100,7 @@ class Rasterizer:
 
         def _floodFill(x, y):
             if self.rasterStencil[y*self.w + x] != self.iRaster:
-                self.setPixel(x, y, v[0].color) # XXX interpolate color
+                self.setPixel(x, y, v[0].z, v[0].color) # XXX interpolate color
                 _floodFill(x+1, y)
                 _floodFill(x-1, y)
                 _floodFill(x, y+1)
@@ -122,7 +128,7 @@ class Rasterizer:
         m2Vertical = vp[2].y == vp[0].y
         m1 = (vp[1].x-vp[0].x) / (vp[1].y-vp[0].y) if not m1Vertical else 0
         m2 = (vp[2].x-vp[0].x) / (vp[2].y-vp[0].y) if not m2Vertical else 0
-        self.setPixel(vp[0].x, vp[0].y, vp[0].color)
+        self.setPixel(vp[0].x, vp[0].y, vp[0].z, vp[0].color)
         for yPx in range(int(vp[0].y), int(vp[1].y)+1):
             x1 = vp[0].x + m1*(yPx - vp[0].y) if not m1Vertical else vp[0].x
             x2 = vp[0].x + m2*(yPx - vp[0].y) if not m2Vertical else vp[0].x
@@ -131,14 +137,15 @@ class Rasterizer:
                 r = self.triIntpScanline(xPx,yPx,v,[vx.color[0] for vx in v])
                 g = self.triIntpScanline(xPx,yPx,v,[vx.color[1] for vx in v])
                 b = self.triIntpScanline(xPx,yPx,v,[vx.color[2] for vx in v])
-                self.setPixel(xPx, yPx, (int(r), int(g), int(b)))
+                z = self.triIntpScanline(xPx,yPx,v,[vx.z for vx in v])
+                self.setPixel(xPx, yPx, z, (int(r), int(g), int(b)))
 
         # Now iterate bottom-to-top
         m1Vertical = vp[0].y == vp[2].y
         m2Vertical = vp[1].y == vp[2].y
         m1 = (vp[0].x-vp[2].x) / (vp[0].y-vp[2].y) if not m1Vertical else 0
         m2 = (vp[1].x-vp[2].x) / (vp[1].y-vp[2].y) if not m2Vertical else 0
-        self.setPixel(vp[2].x, vp[2].y, vp[2].color)
+        self.setPixel(vp[2].x, vp[2].y, vp[2].z, vp[2].color)
         for yPx in range(int(vp[2].y), int(vp[1].y), -1):
             x1 = vp[2].x + m1*(yPx - vp[2].y) if not m1Vertical else vp[2].x
             x2 = vp[2].x + m2*(yPx - vp[2].y) if not m2Vertical else vp[2].x
@@ -147,7 +154,8 @@ class Rasterizer:
                 r = self.triIntpScanline(xPx,yPx,v,[vx.color[0] for vx in v])
                 g = self.triIntpScanline(xPx,yPx,v,[vx.color[1] for vx in v])
                 b = self.triIntpScanline(xPx,yPx,v,[vx.color[2] for vx in v])
-                self.setPixel(xPx, yPx, (int(r), int(g), int(b)))
+                z = self.triIntpScanline(xPx,yPx,v,[vx.z for vx in v])
+                self.setPixel(xPx, yPx, z, (int(r), int(g), int(b)))
 
         self.iRaster += 1
 
