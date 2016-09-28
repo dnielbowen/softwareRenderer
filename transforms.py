@@ -64,6 +64,9 @@ class TriangleRenderer:
         return util.Vertex(
                 float(vs[0]), float(vs[1]), float(vs[2]), color=v.color)
 
-    def renderTriangle(self, vertices, matWorld):
+    def renderTriangle(self, vertices, matWorld, useWireframe=True):
         vsScreen = [self.vertexProcessor(v, matWorld) for v in vertices]
-        self.rasterizer.rasterizeTriangleWireframe(vsScreen)
+        if useWireframe:
+            self.rasterizer.rasterizeTriangleWireframe(vsScreen)
+        else:
+            self.rasterizer.rasterizeTriangleScanline(vsScreen)

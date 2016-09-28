@@ -9,7 +9,7 @@ import parseObj
 
 imWidth = 600
 imHeight = 600
-nFrames = 30
+nFrames = 1
 nRevolutions = 1
 objFilename = "models/wt_teapot.obj"
 
@@ -24,7 +24,7 @@ for iRevolution in range(nFrames):
     tr = transforms.TriangleRenderer(imWidth, imHeight)
     for iFace, face in enumerate(faces):
         triangle = [vertices[i-1] for i in face]
-        tr.renderTriangle(triangle, matWorld)
+        tr.renderTriangle(triangle, matWorld, useWireframe=False)
 
         if (iFace % 600) == 0:
             print("Writing face %04d..." % iFace)
