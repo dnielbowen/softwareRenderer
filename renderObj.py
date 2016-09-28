@@ -9,7 +9,7 @@ import parseObj
 
 imWidth = 600
 imHeight = 600
-nFrames = 360
+nFrames = 1
 nRevolutions = 1
 objFilename = "models/wt_teapot.obj"
 
@@ -24,7 +24,7 @@ for iRevolution in range(nFrames):
     tr = transforms.TriangleRenderer(imWidth, imHeight)
     for iFace, face in enumerate(faces):
         triangle = [vertices[i-1] for i in face]
-        tr.renderTriangle(triangle, matWorld)
+        tr.renderTriangle(triangle, matWorld, useWireframe=False)
 
     tr.rasterizer.save("frames/frame_%03d.png" % iRevolution)
     print("Saving frame %d" % iRevolution)

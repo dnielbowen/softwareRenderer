@@ -12,7 +12,8 @@ def readObjFile(objFilename):
             xs = line.strip().split(' ')
             if xs[0] == 'v':
                 vertices.append(util.Vertex(
-                    float(xs[1]), float(xs[2]), float(xs[3]), color))
+                    float(xs[1]), float(xs[2]), float(xs[3]),
+                    util.randomColor()))
             elif xs[0] == 'f':
                 faces.append(
                     tuple(int(re.sub(r'(\d+).*', r'\1', i)) for i in xs[1:]))
