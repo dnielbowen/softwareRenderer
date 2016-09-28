@@ -25,9 +25,9 @@ cubeFaceIndices = [
     (3,7,6), (2,3,6), # Back-left
 ]
 
-imWidth = 600
-imHeight = 600
-nFrames = 120
+imWidth = 800
+imHeight = 800
+nFrames = 360
 nRevolutions = 1
 
 for iRevolution in range(nFrames):
