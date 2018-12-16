@@ -32,10 +32,10 @@ class Rasterizer:
         x, y = int(x), int(y)
         i = y*self.w + x
         if 0 <= x < self.w and 0 <= y < self.h:
-            if self.depthBuffer[i] > z:
+            if z < self.depthBuffer[i]:
                 self.fb[i] = color
                 self.rasterStencil[i] = self.iRaster
-                self.depthBuffer[i]
+                self.depthBuffer[i] = z
 
     # Horiznotal scanline-style barycentric interpolation within a triangle
     # XXX Works great when there's a large vertical distance between vertices, 
@@ -46,6 +46,8 @@ class Rasterizer:
         vp = sorted(v, key=lambda a: a.y)
 
         # XXX Make sure point is within boundaries
+        if v[1].x == v[2].x:
+            return vertVals[0]
 
         if y > vp[1]: # Use v[1] and v[2]
             horizontalLine1 = v[2].y == v[0].y

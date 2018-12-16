@@ -13,14 +13,15 @@ __init__	rasterizer.py	/^    def __init__(self, w, h):$/;"	m	class:Rasterizer
 __init__	transforms.py	/^    def __init__(self, w, h):$/;"	m	class:TriangleRenderer
 _floodFill	rasterizer.py	/^        def _floodFill(x, y):$/;"	f	function:Rasterizer.rasterizeTriangleFlood
 bgColor	rasterizer.py	/^    bgColor = (200, 200, 200)$/;"	v	class:Rasterizer
-changeCamera	transforms.py	/^    def changeCamera(self, pos, target, hfov=60):$/;"	m	class:TriangleRenderer
+changeCamera	transforms.py	/^    def changeCamera(self, pos, target=np.array((0,0,0)), hfov=60):$/;"	m	class:TriangleRenderer
 imFilename	rasterizer.py	/^    imFilename = "triangleRasterized.png"$/;"	v	class:Rasterizer
 imHeight	renderObj.py	/^imHeight = 600$/;"	v
 imWidth	renderObj.py	/^imWidth = 600$/;"	v
 matWorld	renderObj.py	/^    matWorld = np.eye(4)$/;"	v
-nFrames	renderObj.py	/^nFrames = 30$/;"	v
+modelFilename	renderObj.py	/^modelFilename = "models\/cube.stl"$/;"	v
+nFrames	renderObj.py	/^nFrames = 1$/;"	v
 nRevolutions	renderObj.py	/^nRevolutions = 1$/;"	v
-objFilename	renderObj.py	/^objFilename = "models\/wt_teapot.obj"$/;"	v
+parseSTL	parseSTL.py	/^def parseSTL(stlFilename):$/;"	f
 point	util.py	/^point = lambda x,y,z: np.mat(((x), (y), (z), (1))).transpose()$/;"	v
 r	rasterizer.py	/^    r = Rasterizer(500, 500)$/;"	v	class:Rasterizer
 randomColor	util.py	/^randomColor = lambda: tuple(random.randint(0,255) for i in range(3))$/;"	v
@@ -29,9 +30,9 @@ rasterizeTriangleFlood	rasterizer.py	/^    def rasterizeTriangleFlood(self, v): 
 rasterizeTriangleScanline	rasterizer.py	/^    def rasterizeTriangleScanline(self, v):$/;"	m	class:Rasterizer
 rasterizeTriangleWireframe	rasterizer.py	/^    def rasterizeTriangleWireframe(self, v, color=(255, 255, 255)):$/;"	m	class:Rasterizer
 readObjFile	parseObj.py	/^def readObjFile(objFilename):$/;"	f
-renderTriangle	transforms.py	/^    def renderTriangle(self, vertices, matWorld):$/;"	m	class:TriangleRenderer
+renderTriangle	transforms.py	/^    def renderTriangle(self, vertices, matWorld, useWireframe=True):$/;"	m	class:TriangleRenderer
 save	rasterizer.py	/^    def save(self, imageFilename):$/;"	m	class:Rasterizer
-setPixel	rasterizer.py	/^    def setPixel(self, x, y, color):$/;"	m	class:Rasterizer
+setPixel	rasterizer.py	/^    def setPixel(self, x, y, z, color):$/;"	m	class:Rasterizer
 th	renderObj.py	/^    th = iRevolution * (2*math.pi\/nFrames) * nRevolutions$/;"	v
 tr	renderObj.py	/^    tr = transforms.TriangleRenderer(imWidth, imHeight)$/;"	v
 triIntpScanline	rasterizer.py	/^    def triIntpScanline(self, x, y, v, vertVals):$/;"	m	class:Rasterizer

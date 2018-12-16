@@ -14,17 +14,12 @@ class TriangleRenderer:
         self.w, self.h = w, h
         self.rasterizer = rasterizer.Rasterizer(self.w, self.h)
 
-        self.cameraPos = np.array((2, 1, 1))
-        self.cameraTarget = np.array((0,0,0))
-        self.changeCamera(self.cameraPos, self.cameraTarget)
+        self.changeCamera(np.array((2, 1, 1)))
 
     # pos is np.array((-,-,-))
-    def changeCamera(self, pos, target, hfov=60):
-        self.cameraPos = pos
-        self.cameraTarget = target
-        self.hfov = hfov
+    def changeCamera(self, cameraPos, cameraTarget=np.array((0,0,0)), hfov=60):
         cameraUp = np.array((0,1,0))
-        cameraZ = self.cameraTarget - self.cameraPos
+        cameraZ = cameraTarget - cameraPos
         cameraZ = cameraZ / np.linalg.norm(cameraZ)
         cameraY = np.cross(np.cross(cameraZ, cameraUp), cameraZ)
         cameraY = cameraY / np.linalg.norm(cameraY)
@@ -32,7 +27,7 @@ class TriangleRenderer:
 
         matView = np.eye(4)
         matView[0:3, 0:4] = np.mat((
-            cameraX, cameraY, cameraZ, self.cameraPos)).transpose()
+            cameraX, cameraY, cameraZ, cameraPos)).transpose()
         matView = np.linalg.inv(matView)
         self.matView = matView
 
@@ -40,7 +35,7 @@ class TriangleRenderer:
         projWinWidth = 2
         aspectRatio = 1 # 4/3, etc
         projWinHeight = projWinWidth/aspectRatio
-        d = projWinWidth/(2*math.tan(self.hfov/2*math.pi/180))
+        d = projWinWidth/(2*math.tan(hfov/2*math.pi/180))
         farPlane = 1000
 
         matProj = np.mat((
