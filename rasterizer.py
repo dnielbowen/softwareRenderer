@@ -1,7 +1,8 @@
 # 09/25/16 06:28PM
 # Rasterization is computationally expensive, which is why early real-time 
 # computer graphics were rendered as wireframes. It takes far less time to 
-# rasterize a few lines than to fill a bunch of polygons.
+# connect the dots with a few lines in screen space than it does to fill a 
+# bunch of polygons.
 
 import collections
 import numpy
@@ -12,7 +13,7 @@ from PIL import Image
 import util
 
 # Draws triangles to an image
-class Rasterizer:
+class Rasterizer(object):
     bgColor = (200, 200, 200)
 
     # imFramebuffer: PIL Image object
