@@ -2,10 +2,10 @@
 
 Sept 2016
 
-This is 3D renderer with a perspective camera made from scratch without using 
-any libraries (except numpy for linear algebra), done for educational purposes. 
-It follows mathematical derivations mostly out of the textbooks [Computer 
-Graphics Principles and 
+This is a software 3D renderer with a perspective camera made from scratch 
+without using any libraries (except numpy for linear algebra), done for 
+educational purposes. It follows mathematical derivations mostly out of the 
+textbooks [Computer Graphics Principles and 
 Practice](https://www.amazon.com/John-F-Hughes/dp/0321399528/ref=sr_1_1) and 
 [Interactive Computer Graphics: A Top-Down 
 Approach](https://www.amazon.com/Interactive-Computer-Graphics-Top-Down-Shader-Based/dp/0132545233/ref=sr_1_3). 
